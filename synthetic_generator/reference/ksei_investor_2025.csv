@@ -1,0 +1,10 @@
+dimensi,kategori,batas_bawah,batas_atas,porsi_investor
+umur,<=30,0,31,0.5419
+umur,31-40,31,41,0.2488
+umur,41-50,41,51,0.1232
+umur,51-60,51,61,0.0570
+umur,>60,61,200,0.0290
+penghasilan_tahunan,<Rp10 jt,0,10000000,0.3645
+penghasilan_tahunan,Rp10 jt - Rp100 jt,10000000,100000000,0.4823
+penghasilan_tahunan,Rp100 jt - Rp500 jt,100000000,500000000,0.1180
+penghasilan_tahunan,>Rp500 jt,500000000,1e18,0.0352

@@ -1,0 +1,72 @@
+# RM Copilot Bank: docker compose up, lalu buka http://localhost:8501
+#
+# Service:
+#   app         dashboard Streamlit (membangun data otomatis bila data/processed belum ada)
+#   ollama      LLM lokal Gemma 4 E4B (penjawab Tanya AI dan agent)
+#   ollama-pull mengunduh model gemma4:e4b sekali (6,6 GB), lalu selesai
+#   neo4j       knowledge graph + Graph Data Science, hanya dipakai saat membangun data
+#
+# GPU NVIDIA (opsional): docker compose -f docker-compose.yml -f docker-compose.gpu.yml up
+name: rm-copilot
+
+services:
+  app:
+    build: .
+    image: rm-copilot-app:latest
+    ports:
+      - "8501:8501"
+    environment:
+      OLLAMA_BASE_URL: http://ollama:11434/v1
+      NEO4J_URI: bolt://neo4j:7687
+      NEO4J_USER: neo4j
+      NEO4J_PASSWORD: ${NEO4J_PASSWORD:-rmcopilot-demo}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}   # hanya untuk DeepEval; boleh kosong
+    volumes:
+      - ./data:/app/data
+      - ./outputs:/app/outputs
+      - ./synthetic_generator/output:/app/synthetic_generator/output
+    depends_on:
+      ollama:
+        condition: service_healthy
+      neo4j:
+        condition: service_started
+    restart: unless-stopped
+
+  ollama:
+    image: ollama/ollama:0.40.2
+    volumes:
+      - ollama:/root/.ollama
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    restart: unless-stopped
+
+  ollama-pull:
+    image: ollama/ollama:0.40.2
+    environment:
+      OLLAMA_HOST: ollama:11434
+    entrypoint: ["ollama", "pull", "gemma4:e4b"]
+    depends_on:
+      ollama:
+        condition: service_healthy
+    restart: "no"
+
+  neo4j:
+    image: neo4j:2026.09.0-community
+    environment:
+      NEO4J_AUTH: neo4j/${NEO4J_PASSWORD:-rmcopilot-demo}
+      NEO4J_PLUGINS: '["apoc", "graph-data-science"]'
+      NEO4J_dbms_security_procedures_unrestricted: apoc.*,gds.*
+      NEO4J_server_memory_heap_max__size: 1G      # cukup untuk graph 94 rb node / 973 rb relasi
+      NEO4J_server_memory_pagecache_size: 512M
+    ports:
+      - "7474:7474"   # Neo4j Browser untuk melihat graph: http://localhost:7474
+    volumes:
+      - neo4j:/data
+    restart: unless-stopped
+
+volumes:
+  ollama:
+  neo4j:

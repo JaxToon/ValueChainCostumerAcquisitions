@@ -1,0 +1,45 @@
+file,kolom,status,berlaku_untuk,di_data_bank,sumber_dunia_nyata,boleh_fitur_model,catatan
+nasabah.csv,person_id,HIJAU,nasabah,ya,CIF core banking,tidak,ID; bukan fitur
+nasabah.csv,usia_bulan1,HIJAU,nasabah,ya,KTP saat KYC,ya,
+nasabah.csv,jenis_kelamin,HIJAU,nasabah,ya,KTP saat KYC,tidak,Hanya untuk audit fairness (POJK 22/2023 Pasal 4)
+nasabah.csv,provinsi,HIJAU,nasabah,ya,Alamat KYC,ya,
+nasabah.csv,perkotaan,HIJAU,nasabah,ya,Diturunkan dari alamat KYC + klasifikasi desa BPS,ya,
+nasabah.csv,pekerjaan,HIJAU,nasabah,ya,Formulir KYC (APU-PPT),ya,
+nasabah.csv,kisaran_pendapatan,HIJAU,nasabah,ya,Formulir KYC: kisaran penghasilan yang diisi nasabah,ya,Bank umumnya hanya punya kisaran yang dilaporkan sendiri
+nasabah.csv,pendapatan_bulanan_idr,MERAH,nasabah,tidak (kunci_evaluasi),Tidak tersedia sebagai angka pasti,tidak,Angka pasti hanya di kunci_evaluasi
+nasabah.csv,bulan_masuk / bulan_keluar / lama_nasabah_bulan_saat_masuk_panel,HIJAU,nasabah,ya,Data pembukaan dan penutupan rekening,ya,
+nasabah.csv,channel,HIJAU,nasabah,ya,Data pembukaan rekening,ya,
+nasabah_bulanan.parquet,prod_*,HIJAU,nasabah,ya,Core banking: kepemilikan produk per bulan,ya,
+nasabah_bulanan.parquet,usia / segmen / aktif / lama_nasabah_bulan,HIJAU,nasabah,ya,CIF dan core banking,ya,
+companies.csv,"company_id, nama_samaran, is_anchor, is_bank_customer",HIJAU,semua,ya,CIF korporasi / identitas di transfer,tidak,ID dan penanda
+companies.csv,bank_utama,KUNING,non-nasabah,ya,Kode bank penerima/pengirim di pesan transfer BI-FAST/SKN/RTGS,ya,Hanya terlihat bila bertransaksi dengan nasabah Bank
+companies.csv,"sektor, provinsi, tahun_berdiri",ORANYE,non-nasabah,ya,Registry publik OSS/NIB dan AHU Kemenkumham (perlu diambil terpisah),ya,Untuk nasabah: KYC korporasi
+companies.csv,"skala, omzet_tahunan_rp, jumlah_karyawan, peran, bank_payroll",MERAH,non-nasabah,dikosongkan,Tidak terlihat oleh bank,tidak,Untuk nasabah korporasi: HIJAU (KYC/laporan keuangan)
+companies.csv,produk_bank,HIJAU,nasabah,ya,Core banking,ya,
+persons.csv,"usia, jenis_kelamin, provinsi, perkotaan, pekerjaan, kisaran_pendapatan",MERAH,non-nasabah,dikosongkan,Transfer gaji hanya memuat nama/rekening/nominal,tidak,Untuk nasabah: HIJAU (KYC)
+persons.csv,bank_utama,KUNING,non-nasabah,ya,Bank penerima di transfer gaji dari rekening Bank,ya,
+employment.csv,KARYAWAN (nasabah),HIJAU,nasabah,ya,Formulir KYC (tempat bekerja) / file payroll,ya,
+employment.csv,KARYAWAN (non-nasabah),KUNING,non-nasabah,ya,Transfer gaji dari rekening Bank perusahaan,ya,Hanya untuk analisis internal; pemasaran lewat perusahaan (PRD bagian 18)
+employment.csv,PEMILIK,KUNING,semua,hanya perusahaan nasabah Bank,Data beneficial owner KYC korporasi,ya,Pemilik usaha non-nasabah tidak terlihat
+transfers_monthly.csv,semua kolom,KUNING,semua,hanya transfer dengan sisi Bank,Mutasi rekening Bank; pesan transfer antarbank,ya,Transfer antar dua pihak non-nasabah tidak terlihat oleh bank
+transfers_monthly.csv,jenis_relasi_terlihat,ORANYE,semua,ya,Ditebak dari pola dan berita transfer,ya,Sebagian sengaja UNKNOWN
+relationship_truth.csv,semua kolom,MERAH,semua,tidak (kunci_evaluasi),Tidak ada di dunia nyata,tidak,Hanya untuk evaluasi
+acquisitions.csv,semua kolom,HIJAU,non-nasabah terlihat,ya,Data pembukaan rekening (label),tidak,Label target; hanya kandidat yang terlihat bank
+companies.csv,"segmen_bank",HIJAU,nasabah,ya (kosong untuk non-nasabah),Segmentasi bank dari omzet KYC korporasi,ya,Batas: UMKM < Rp2 M (ASUMSI) | RCC < Rp10 M | Commercial Rp10-150 M (interview) | Corporate > Rp150 M (ASUMSI)
+companies.csv,"cif, status_debitur_awal, ada_pic_terdaftar, rm_id, cabang",HIJAU,nasabah,ya,CIF korporasi dan sistem kredit; data RM dan cabang,ya (kecuali ID),PIC hanya berupa flag; nama dan nomor kontak tidak dibuat
+rm_portofolio.csv,semua kolom,HIJAU,nasabah wholesale,ya,Daftar kelolaan RM,tidak,Ukuran portofolio dari interview (perlu validasi)
+transaksi_counterparty_bulanan.csv,"company_id, arah, jumlah_transaksi, total_nominal_rp, channel",HIJAU,nasabah,ya,Mutasi rekening Bank dan pesan RTGS/SKN/BI-FAST,ya,Satu baris = nasabah x counterpart x bulan x arah; channel = channel dominan
+transaksi_counterparty_bulanan.csv,"counterparty_id, counterparty_nama, counterparty_bank",KUNING,non-nasabah,ya,Nama dan bank penerima/pengirim di pesan transfer antarbank,ya,Nama diketik beragam (data kotor); hanya untuk analisis internal (PRD bagian 18)
+transaksi_counterparty_bulanan.csv,kelas_nama_bank,HIJAU,semua,ya,Diturunkan dari nama dan bank di pesan transfer,ya,4 kelas: nama sama/beda x bank sama/beda
+saldo_bulanan.csv,semua kolom,HIJAU,nasabah,ya,Core banking: saldo rata-rata dan saldo akhir bulan,ya,
+riwayat_produk_wholesale.csv,semua kolom,HIJAU,nasabah,ya,Core banking dan sistem trade finance,ya,beneficiary_id = ANCHOR atau pemilik proyek (ID samaran)
+fasilitas_pembiayaan.csv,semua kolom,HIJAU,debitur,ya,Sistem kredit,ya,
+lead_bisdev.csv,semua kolom,KUNING,non-nasabah,ya,File Excel tim Bisdev,ya,Tanpa company_id: harus dicocokkan lewat nama (entity resolution); kunci di kunci_evaluasi/lead_bisdev_kunci.csv
+label_wholesale.csv,semua kolom,HIJAU,nasabah wholesale,ya,Riwayat produk dan fasilitas (label),tidak,Label target di jendela label; jangan dipakai sebagai fitur
+companies.csv,"punya_rekening_bank_lain, punya_beberapa_rekening_bank, bank_lain_sendiri",MERAH,nasabah,tidak (kunci_evaluasi),Tidak terlihat langsung; hanya tersirat dari transfer nama sama,tidak,Kebenaran untuk evaluasi leakage
+counterparty_pindah_bank.csv,semua kolom,MERAH,non-nasabah,tidak (kunci_evaluasi),Tidak ada di dunia nyata,tidak,Kebenaran sinyal pindah bank
+employment.csv,PEMBELI (pedagang),KUNING,non-nasabah,ya,Pembayaran pedagang ke rekening Bank distributor/anchor,ya,Pedagang perorangan; dihubungi hanya lewat program anchor (PRD bagian 18)
+acquisitions.csv,jendela,HIJAU,non-nasabah terlihat,ya,Diturunkan dari bulan jadi nasabah,tidak,"1 = validasi (label bulan 6-11), 2 = test (label bulan 12-17), 0 = tidak jadi nasabah"
+label_wholesale.csv,jendela,HIJAU,nasabah wholesale,ya,Diturunkan dari bulan kejadian,tidak,"1 = validasi (bulan 6-11), 2 = test (bulan 12-17)"
+fasilitas_pembiayaan.csv,produk KUR Mikro / KUR Kecil,HIJAU,debitur UMKM,ya,Sistem kredit (KUR),ya,Katalog no. 108 dan 109; batas plafon di config wholesale
+riwayat_produk_wholesale.csv,produk QRIS Bank / EDC Bank,HIJAU,nasabah UMKM,ya,Data merchant Bank,ya,Katalog no. 207 dan 199

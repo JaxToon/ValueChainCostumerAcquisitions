@@ -1,0 +1,16 @@
+produk,no_katalog,jenis,analog_santander,cara_level,umur_min,umur_max,pendapatan_min,pekerjaan_syarat,prasyarat,sumber_aturan
+Tabungan Plus,1,utama,ind_cco_fin_ult1,aturan,17,79,0,semua,,Katalog no.1: perorangan dewasa 17+; usia <17 diarahkan ke Tabungan Plus Anak
+Tabungan Plus Muda,6,utama,ind_cco_fin_ult1,aturan,17,35,0,semua,,Katalog no.6: mahasiswa/first jobber/anak muda 17-35; di atas 35 diarahkan ke Tabungan Plus
+Tabungan Plus Anak,5,utama,ind_cco_fin_ult1,aturan,15,16,0,semua,,Katalog no.5: anak di bawah 17; data SNLIK mulai umur 15
+Bank Giro,3,tambahan,ind_ctpp_fin_ult1,lps_nontabungan,17,79,0,Pengusaha/Wiraswasta;Pegawai/Profesional,,Katalog no.3: perorangan yang membayar/menerima via cek/BG
+Bank Deposito,28,tambahan,ind_dela_fin_ult1,lps_nontabungan,17,79,0,semua,,Katalog no.28: punya rekening Bank dan dana menganggur
+Mobile Banking,192,tambahan,ind_ecue_fin_ult1,mobile banking,17,79,0,semua,,Katalog no.192: semua nasabah perorangan dengan smartphone
+Bank Payroll,39,tambahan,ind_nomina_ult1,santander,17,79,0,Pegawai/Profesional,,Katalog no.39: karyawan perusahaan/instansi dengan perjanjian payroll
+Bank Visa Platinum,46,tambahan,ind_tjcr_fin_ult1,akki,21,79,3000000,Pegawai/Profesional;Pengusaha/Wiraswasta;Pensiunan/Purnawirawan;Petani/Peternak/Pekebun/Nelayan;Pekerjaan Lainnya,,"Katalog no.46: butuh bukti penghasilan. Bank Indonesia PADG 32/2025 (APMK): pemegang kartu utama minimal 21 tahun atau menikah, pendapatan minimal Rp3 juta per bulan; status menikah tidak dimodelkan sehingga dipakai 21 tahun"
+KPR Pembelian,30,tambahan,ind_hip_fin_ult1,santander,17,79,0,Pegawai/Profesional;Pengusaha/Wiraswasta,,Katalog no.30: pegawai/profesional/wiraswasta berpenghasilan tetap
+Bank Fleksi,37,tambahan,ind_pres_fin_ult1,santander,17,79,0,Pegawai/Profesional,,Katalog no.37: pegawai berpenghasilan tetap; tidak cocok jika tidak berpenghasilan tetap
+DPLK Pensiun,29,tambahan,ind_plan_fin_ult1,snlik:Dana Pensiun,17,79,0,Pegawai/Profesional;Pengusaha/Wiraswasta,,Katalog no.29: karyawan/profesional/wiraswasta
+Reksa Dana (agen penjual),99,tambahan,ind_fond_fin_ult1,snlik_bagi:Pasar Modal,17,79,0,semua,,Katalog no.99: punya rekening Bank dan SID
+Bonds,88,tambahan,ind_valo_fin_ult1,snlik_bagi:Pasar Modal,17,79,0,semua,,Katalog no.88: punya rekening Bank dan rekening surat berharga
+Autodebit,144,tambahan,ind_recibo_ult1,santander,17,79,0,semua,,Katalog no.144: punya rekening terdaftar dan tagihan rutin
+Prioritas,100,tambahan,ind_ctpp_fin_ult1,santander_top,17,79,0,semua,,Katalog no.100: dana kelolaan memenuhi minimum (didekati dengan peringkat pendapatan)

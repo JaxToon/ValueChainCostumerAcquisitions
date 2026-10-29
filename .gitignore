@@ -1,0 +1,16 @@
+.env
+.venv/
+/Data/
+/data/
+/outputs/
+.cache/
+__pycache__/
+*.pyc
+synthetic_generator/output/
+# Zip data untuk dibagikan ke tim lewat Google Drive, bukan lewat git
+*.zip
+.archify/
+# local-only material (internal docs, eval runs)
+_private/
+.deepeval/
+.pytest_cache/

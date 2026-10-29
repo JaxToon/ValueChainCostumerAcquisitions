@@ -1,0 +1,11 @@
+# Opsional: jalankan Gemma di GPU NVIDIA (Docker Desktop + WSL2 + driver NVIDIA).
+#   docker compose -f docker-compose.yml -f docker-compose.gpu.yml up
+services:
+  ollama:
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]

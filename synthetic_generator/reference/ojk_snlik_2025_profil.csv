@@ -1,0 +1,24 @@
+dimensi,kategori,jumlah_juta
+desa,Perkotaan,129.934
+desa,Perdesaan,83.895
+gender,Laki-Laki,107.712
+gender,Perempuan,106.117
+umur,15-17,13.963
+umur,18-25,34.342
+umur,26-35,44.455
+umur,36-50,61.677
+umur,51-79,59.391
+pekerjaan,Pegawai/Profesional,39.775
+pekerjaan,Pengusaha/Wiraswasta,27.85
+pekerjaan,Pensiunan/Purnawirawan,1.991
+pekerjaan,Petani/Peternak/Pekebun/Nelayan,39.12
+pekerjaan,Pekerjaan Lainnya,28.024
+pekerjaan,Pelajar/Mahasiswa,20.38
+pekerjaan,Ibu Rumah Tangga,41.673
+pekerjaan,Tidak/Belum Pernah Bekerja,15.017
+pendapatan,< 500 rb,10.203
+pendapatan,"500 rb - 1,5 jt",48.667
+pendapatan,"1,5 - 2,5 jt",34.661
+pendapatan,"2,5 - 3,5 jt",22.613
+pendapatan,"> 3,5 jt",20.616
+pendapatan,Tidak ada kegiatan ekonomi,77.069

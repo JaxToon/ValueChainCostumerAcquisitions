@@ -1,0 +1,459 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Arsitektur RM Copilot Bank — Relationship & Value Chain Intelligence",
+    "output": "docs/arsitektur/arsitektur-rm-copilot.html",
+    "quality_profile": "showcase",
+    "repository": {
+      "url": "https://github.com/JaxToon/value-chain-rm-copilot.git",
+      "provider": "github",
+      "link_mode": "web",
+      "revision": "99cee3a779e2bc17af80b2cac5b12c896c838044"
+    }
+  },
+  "components": [
+    {
+      "id": "gen",
+      "type": "backend",
+      "label": "Generator data sintetis",
+      "sublabel": "seed 42 · BPS, OJK, KSEI",
+      "pos": [
+        40,
+        80
+      ],
+      "size": [
+        150,
+        64
+      ],
+      "sources": [
+        {
+          "path": "synthetic_generator/run.py"
+        },
+        {
+          "path": "synthetic_generator/config.yaml"
+        }
+      ]
+    },
+    {
+      "id": "clean",
+      "type": "backend",
+      "label": "Cleaning data",
+      "sublabel": "entity resolution",
+      "pos": [
+        320,
+        80
+      ],
+      "size": [
+        150,
+        64
+      ],
+      "sources": [
+        {
+          "path": "src/data/clean.py"
+        }
+      ]
+    },
+    {
+      "id": "neo4j",
+      "type": "database",
+      "label": "Neo4j + GDS",
+      "sublabel": "FastRP · PageRank · Louvain",
+      "pos": [
+        600,
+        80
+      ],
+      "size": [
+        160,
+        64
+      ],
+      "sources": [
+        {
+          "path": "src/graph/ingest.py"
+        },
+        {
+          "path": "src/graph/algorithms.py"
+        }
+      ]
+    },
+    {
+      "id": "feat",
+      "type": "backend",
+      "label": "Fitur + sinyal F19",
+      "sublabel": "tabel + graph per jendela",
+      "pos": [
+        890,
+        80
+      ],
+      "size": [
+        150,
+        64
+      ],
+      "sources": [
+        {
+          "path": "src/features/acq_features.py"
+        },
+        {
+          "path": "src/features/wholesale_features.py"
+        },
+        {
+          "path": "src/features/signals.py"
+        }
+      ]
+    },
+    {
+      "id": "models",
+      "type": "backend",
+      "label": "Training & champion",
+      "sublabel": "6 model · kalibrasi · SHAP",
+      "pos": [
+        1170,
+        80
+      ],
+      "size": [
+        160,
+        64
+      ],
+      "sources": [
+        {
+          "path": "src/models/train.py"
+        },
+        {
+          "path": "src/explain/shap_explain.py"
+        },
+        {
+          "path": "pipelines/run_offline.py"
+        }
+      ]
+    },
+    {
+      "id": "store",
+      "type": "database",
+      "label": "data/processed + outputs",
+      "sublabel": "parquet · CSV · laporan",
+      "pos": [
+        1170,
+        260
+      ],
+      "size": [
+        160,
+        64
+      ],
+      "sources": [
+        {
+          "path": "config/settings.yaml"
+        },
+        {
+          "path": "app/components/data.py"
+        }
+      ]
+    },
+    {
+      "id": "rag",
+      "type": "database",
+      "label": "Katalog Bank (RAG)",
+      "sublabel": "216 produk · TF-IDF",
+      "pos": [
+        890,
+        260
+      ],
+      "size": [
+        150,
+        64
+      ],
+      "sources": [
+        {
+          "path": "src/genai/rag.py"
+        },
+        {
+          "path": "synthetic_generator/reference/produk_bank_knowledge.csv"
+        }
+      ]
+    },
+    {
+      "id": "app",
+      "type": "frontend",
+      "label": "Dashboard Streamlit",
+      "sublabel": "login · 3 peran · profit F12",
+      "pos": [
+        1170,
+        440
+      ],
+      "size": [
+        160,
+        64
+      ],
+      "sources": [
+        {
+          "path": "app/Home.py"
+        },
+        {
+          "path": "app/components/auth.py"
+        },
+        {
+          "path": "src/impact/profit.py"
+        }
+      ]
+    },
+    {
+      "id": "agent",
+      "type": "backend",
+      "label": "Agent F17 + Tanya AI",
+      "sublabel": "6 tool hanya-baca",
+      "pos": [
+        890,
+        440
+      ],
+      "size": [
+        150,
+        64
+      ],
+      "sources": [
+        {
+          "path": "src/genai/agent.py"
+        },
+        {
+          "path": "src/genai/tanya.py"
+        },
+        {
+          "path": "src/genai/tools.py"
+        }
+      ]
+    },
+    {
+      "id": "guard",
+      "type": "security",
+      "label": "Guardrail input/output",
+      "sublabel": "aturan + semantik Gemma",
+      "pos": [
+        610,
+        440
+      ],
+      "size": [
+        150,
+        64
+      ],
+      "sources": [
+        {
+          "path": "src/guardrails/input_guard.py"
+        },
+        {
+          "path": "src/guardrails/output_guard.py"
+        },
+        {
+          "path": "src/genai/llm.py"
+        }
+      ]
+    },
+    {
+      "id": "audit",
+      "type": "database",
+      "label": "Audit log SQLite",
+      "sublabel": "tool call · keputusan RM",
+      "pos": [
+        330,
+        440
+      ],
+      "size": [
+        150,
+        64
+      ],
+      "sources": [
+        {
+          "path": "src/guardrails/audit_log.py"
+        }
+      ]
+    },
+    {
+      "id": "ollama",
+      "type": "external",
+      "label": "Gemma 4 E4B (Ollama)",
+      "sublabel": "lokal · localhost:11434",
+      "pos": [
+        890,
+        620
+      ],
+      "size": [
+        150,
+        64
+      ],
+      "sources": [
+        {
+          "path": "src/genai/llm.py"
+        },
+        {
+          "path": "config/settings.yaml"
+        }
+      ]
+    },
+    {
+      "id": "rm",
+      "type": "external",
+      "icon": "person",
+      "label": "RM dan manajemen",
+      "sublabel": "Retail · Wholesale · pimpinan",
+      "pos": [
+        1170,
+        620
+      ],
+      "size": [
+        160,
+        64
+      ],
+      "sources": [
+        {
+          "path": "app/components/pack.py"
+        }
+      ]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "Pipeline offline · python -m pipelines.run_offline",
+      "wraps": [
+        "clean",
+        "neo4j",
+        "feat",
+        "models"
+      ]
+    },
+    {
+      "kind": "region",
+      "label": "Runtime demo di laptop (tanpa Neo4j, tanpa internet)",
+      "wraps": [
+        "store",
+        "rag",
+        "app",
+        "agent",
+        "guard",
+        "audit",
+        "ollama"
+      ]
+    },
+    {
+      "kind": "security-group",
+      "label": "Guardrail 4 lapis",
+      "wraps": [
+        "guard",
+        "audit"
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "id": "gen-clean",
+      "from": "gen",
+      "to": "clean",
+      "label": "data_bank"
+    },
+    {
+      "id": "clean-neo4j",
+      "from": "clean",
+      "to": "neo4j",
+      "label": "ingest"
+    },
+    {
+      "id": "neo4j-feat",
+      "from": "neo4j",
+      "to": "feat",
+      "label": "skor graph"
+    },
+    {
+      "id": "feat-models",
+      "from": "feat",
+      "to": "models",
+      "label": "fitur"
+    },
+    {
+      "id": "models-store",
+      "from": "models",
+      "to": "store",
+      "label": "skor + SHAP"
+    },
+    {
+      "id": "rm-app",
+      "from": "rm",
+      "to": "app",
+      "label": "klik / tanya",
+      "variant": "emphasis"
+    },
+    {
+      "id": "store-app",
+      "from": "store",
+      "to": "app",
+      "label": "baca parquet"
+    },
+    {
+      "id": "app-agent",
+      "from": "app",
+      "to": "agent",
+      "label": "panggil agent",
+      "variant": "emphasis"
+    },
+    {
+      "id": "agent-rag",
+      "from": "agent",
+      "to": "rag",
+      "label": "cari_katalog"
+    },
+    {
+      "id": "agent-ollama",
+      "from": "agent",
+      "to": "ollama",
+      "label": "chat + tools"
+    },
+    {
+      "id": "agent-guard",
+      "from": "agent",
+      "to": "guard",
+      "label": "cek guardrail",
+      "variant": "security"
+    },
+    {
+      "id": "guard-audit",
+      "from": "guard",
+      "to": "audit",
+      "label": "catat log",
+      "variant": "security"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Pipeline offline",
+      "items": [
+        "Walk-forward: train jendela lama, test jendela terbaru",
+        "Champion dipilih dari PR-AUC validasi, lalu kalibrasi isotonic",
+        "Hasil ditulis ke data/processed dan docs/Hasil_Model.md"
+      ]
+    },
+    {
+      "dot": "prioritas",
+      "title": "Runtime demo",
+      "items": [
+        "Dashboard hanya membaca file; Neo4j tidak perlu menyala",
+        "Login demo: beranda dan menu per peran (RM Retail, RM Wholesale, Manajemen)",
+        "Gemma lokal tidak bisa dijangkau → jawaban template; entitas demo di cache",
+        "docker compose up: app, Ollama, dan Neo4j dalam satu perintah"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Guardrail 4 lapis",
+      "items": [
+        "Input: pola injeksi, data pihak lain, topik, masking ID, klasifikasi semantik Gemma",
+        "Output: katalog, kelayakan, hanya produk dari model, sumber, janji imbal hasil, footer OJK",
+        "Audit log + model + versi prompt; keputusan RM: setujui, edit, tolak"
+      ]
+    },
+    {
+      "dot": "violet",
+      "title": "Evaluasi (offline)",
+      "items": [
+        "DeepEval 45 kasus, juri gpt-4.1-mini (OpenAI)",
+        "OPENAI_API_KEY hanya untuk juri, tidak untuk menjawab"
+      ]
+    }
+  ]
+}

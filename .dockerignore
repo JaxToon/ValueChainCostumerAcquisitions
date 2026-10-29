@@ -1,0 +1,16 @@
+# Data, hasil, dan rahasia di-mount atau diisi lewat environment, tidak masuk image.
+.env
+.venv/
+data/
+Data/
+outputs/
+synthetic_generator/output/
+.cache/
+.deepeval/
+.git/
+.playwright-cli/
+.archify/
+**/__pycache__/
+*.pyc
+*.pdf
+eda/

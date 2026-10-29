@@ -1,0 +1,34 @@
+dimensi,kategori,inklusi_persen
+desa,Perkotaan,83.61
+desa,Perdesaan,75.7
+gender,Laki-Laki,80.73
+gender,Perempuan,80.28
+umur,15-17,74.0
+umur,18-25,89.96
+umur,26-35,86.1
+umur,36-50,85.81
+umur,51-79,66.88
+pekerjaan,Pegawai/Profesional,95.11
+pekerjaan,Pengusaha/Wiraswasta,88.66
+pekerjaan,Pensiunan/Purnawirawan,100.0
+pekerjaan,Petani/Peternak/Pekebun/Nelayan,69.4
+pekerjaan,Pekerjaan Lainnya,74.73
+pekerjaan,Pelajar/Mahasiswa,84.42
+pekerjaan,Ibu Rumah Tangga,78.24
+pekerjaan,Tidak/Belum Pernah Bekerja,64.82
+pendapatan,< 500 rb,65.56
+pendapatan,"500 rb - 1,5 jt",71.42
+pendapatan,"1,5 - 2,5 jt",85.59
+pendapatan,"2,5 - 3,5 jt",94.48
+pendapatan,"> 3,5 jt",97.64
+pendapatan,Tidak ada kegiatan ekonomi,77.26
+nasional,Indonesia,80.51
+sektor,Perbankan,70.65
+sektor,Pasar Modal,1.34
+sektor,Perasuransian,28.5
+sektor,Lembaga Pembiayaan,12.38
+sektor,Dana Pensiun,5.37
+sektor,Pergadaian,8.23
+sektor,Lembaga Keuangan Mikro,1.2
+sektor,Fintech Lending,4.4
+sektor,Lembaga Jasa Keuangan Lainnya,14.71

@@ -1,0 +1,13 @@
+# Tema dashboard: teal Bank sebagai warna utama (tombol, progress bar, tautan aktif).
+[theme]
+base = "light"
+primaryColor = "#006D77"
+backgroundColor = "#F6F8F9"
+secondaryBackgroundColor = "#FFFFFF"
+textColor = "#14303A"
+
+[client]
+toolbarMode = "minimal"   # sembunyikan tombol Deploy
+
+[server]
+headless = true

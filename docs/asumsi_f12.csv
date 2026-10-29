@@ -1,0 +1,36 @@
+parameter,nilai,satuan,status,dasar
+spread_kredit,0.045,per tahun dari baki debet,PROKSI,Pendapatan bunga bersih Bank Rp40.33 T / kredit Rp899.53 T (FY2025; Kontan 3 Feb 2026)
+spread_dana,0.02,per tahun dari saldo,ASUMSI,Tidak ada angka publik per produk
+expected_loss_kredit,0.015,per tahun dari baki debet,ASUMSI,Mengurangi nilai kredit
+biaya_kunjungan_rm_wholesale,750000,Rp per prospek,ASUMSI,Slider 250000-2000000
+biaya_kontak_ritel,15000,Rp per nasabah,ASUMSI,Slider 5000-50000
+biaya_kontak_pedagang,50000,Rp per pedagang,ASUMSI,Lewat program anchor
+biaya_salah_jual,2000000,Rp per kasus,ASUMSI,Kasus yang diblokir guardrail
+pengali_makro_bunga_turun,1.1,pengali konversi kredit,ASUMSI,Slider
+pengali_makro_bunga_tetap,1.0,pengali konversi kredit,ASUMSI,Slider
+pengali_makro_bunga_naik,0.9,pengali konversi kredit,ASUMSI,Slider
+skenario_konservatif,0.7,pengali konversi,ASUMSI,Slider
+skenario_moderat,1.0,pengali konversi,ASUMSI,Slider
+skenario_optimis,1.3,pengali konversi,ASUMSI,Slider
+porsi_wallet_tahun_pertama,0.5,porsi nilai nasabah sejenis,ASUMSI,Interview: product acquisition tidak sama dengan immediate wallet acquisition
+fee_cib,6000000,Rp per tahun,ASUMSI,CIB dan turunannya
+fee_virtual_account,12000000,Rp per tahun,ASUMSI,VA Kredit dan VA Debit
+fee_trade_porsi_nilai_proyek,0.005,porsi nilai proyek,ASUMSI,L/C SKBDN SBLC Garansi Bank
+fee_cash_pooling_sweep,24000000,Rp per tahun,ASUMSI,Cash Pooling dan Account Sweep
+fee_payroll_per_karyawan,100000,Rp per tahun,ASUMSI,Payroll Korporasi
+fee_qris,300000,Rp per tahun,ASUMSI,QRIS Bank per merchant
+fee_edc,1200000,Rp per tahun,ASUMSI,EDC Bank per merchant
+nilai_tabungan_plus_bisnis,300000,Rp per tahun,ASUMSI,Saldo Rp15 juta x spread dana
+nilai_tabungan_plus,100000,Rp per tahun,ASUMSI,Saldo Rp5 juta x spread dana
+nilai_deposito_perorangan,2000000,Rp per tahun,ASUMSI,Saldo Rp100 juta x spread dana
+nilai_giro_perorangan,1000000,Rp per tahun,ASUMSI,Saldo Rp50 juta x spread dana
+nilai_mobile,60000,Rp per tahun,ASUMSI,Fee transaksi dan efisiensi layanan
+nilai_payroll_perorangan,80000,Rp per tahun,ASUMSI,Saldo gaji Rp4 juta x spread dana
+nilai_visa_platinum,660000,Rp per tahun,ASUMSI,Fee + outstanding Rp8 juta x spread kredit
+nilai_kpr,12000000,Rp per tahun,ASUMSI,Outstanding Rp400 juta x (spread - expected loss)
+nilai_fleksi,1800000,Rp per tahun,ASUMSI,Outstanding Rp60 juta x (spread - expected loss)
+nilai_dplk,150000,Rp per tahun,ASUMSI,Fee pengelolaan
+nilai_reksa_dana_bonds,125000,Rp per tahun,ASUMSI,0.5% dari dana Rp25 juta
+nilai_autodebit,24000,Rp per tahun,ASUMSI,Fee tahunan
+nilai_prioritas,10000000,Rp per tahun,ASUMSI,Dana kelolaan Rp500 juta x spread dana
+hari_kas_prospek,15,hari,ASUMSI,Saldo perkiraan prospek perusahaan = arus bulanan yang terlihat x hari kas / 30 (tengah rentang 5-30 hari di generator)

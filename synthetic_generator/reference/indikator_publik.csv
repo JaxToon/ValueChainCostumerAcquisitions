@@ -1,0 +1,13 @@
+indikator,nilai,satuan,tanggal_data,sumber
+kartu_kredit_beredar,18800522,keping,2025-06,AKKI via GoodStats (akki.or.id/statistik)
+rekening_simpanan_bank_umum,667110000,rekening,2026-04,LPS Ringkasan Eksekutif Distribusi Simpanan Bank Umum April 2026
+porsi_rekening_tabungan,0.9827,proporsi,2026-04,LPS Ringkasan Eksekutif Distribusi Simpanan Bank Umum April 2026
+porsi_rekening_sampai_100jt,0.9889,proporsi,2026-04,LPS Ringkasan Eksekutif Distribusi Simpanan Bank Umum April 2026
+pengguna_mobile,15100000,orang,2026-06,Bank Paparan Kinerja Semester I 2026 (diberitakan FortuneIDN dan Liputan6)
+penduduk_15_79,213829000,orang,2025,OJK-BPS SNLIK 2025 Lampiran 1
+omzet_maks_mikro,2000000000,rupiah per tahun,2021,PP 7/2021 Pasal 35
+omzet_maks_kecil,15000000000,rupiah per tahun,2021,PP 7/2021 Pasal 35
+omzet_maks_menengah,50000000000,rupiah per tahun,2021,PP 7/2021 Pasal 35
+tenaga_kerja_maks_mikro,4,orang,-,BPS klasifikasi usaha menurut tenaga kerja
+tenaga_kerja_maks_kecil,19,orang,-,BPS klasifikasi usaha menurut tenaga kerja
+tenaga_kerja_maks_menengah,99,orang,-,BPS klasifikasi usaha menurut tenaga kerja

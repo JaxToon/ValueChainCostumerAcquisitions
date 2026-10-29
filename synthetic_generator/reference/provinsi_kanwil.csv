@@ -1,0 +1,39 @@
+provinsi,kanwil_id,catatan
+Aceh,W01,"kanwil.csv: Sumatera Utara & sekitarnya"
+Sumatera Utara,W01,
+Sumatera Barat,W02,
+Riau,W02,
+Kepulauan Riau,W02,
+Sumatera Selatan,W03,
+Jambi,W03,
+Bengkulu,W03,
+Lampung,W03,
+Kepulauan Bangka Belitung,W03,
+Jawa Barat,W04,"Kanwil utama; Bogor dan Depok dilayani W14, Bekasi dan Karawang W15 (perlu data kota)"
+Jawa Tengah,W05,"Kanwil utama; Solo, Purwokerto, Cilacap dilayani W17 (perlu data kota)"
+DI Yogyakarta,W17,
+Jawa Timur,W06,"Kanwil utama; bagian selatan dilayani W18 Malang (perlu data kota)"
+DKI Jakarta,W10,"Kanwil utama; DKI dibagi W10, W12, W15 per wilayah kota (perlu data kota)"
+Banten,W14,"kanwil.csv: Tangerang, Tangerang Selatan, Serang"
+Bali,W08,
+Nusa Tenggara Barat,W08,
+Nusa Tenggara Timur,W08,
+Kalimantan Barat,W09,
+Kalimantan Tengah,W09,
+Kalimantan Selatan,W09,
+Kalimantan Timur,W09,
+Kalimantan Utara,W09,
+Sulawesi Selatan,W07,
+Sulawesi Barat,W07,
+Sulawesi Tenggara,W07,
+Maluku,W07,"kanwil.csv menyebut Maluku di W07 dan W16; dipetakan ke W07"
+Sulawesi Utara,W11,
+Sulawesi Tengah,W11,
+Gorontalo,W11,
+Maluku Utara,W16,"kanwil.csv: Maluku Papua; dipetakan ke W16"
+Papua,W16,
+Papua Barat,W16,
+Papua Barat Daya,W16,
+Papua Pegunungan,W16,
+Papua Selatan,W16,
+Papua Tengah,W16,

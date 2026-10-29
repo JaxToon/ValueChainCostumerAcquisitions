@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Skema Knowledge Graph</title>
+<style>
+  :root {
+    --bg: #f7f6f2; --card: #ffffff; --ink: #1d2433; --muted: #5b6475; --line: #8a93a6; --border: #e2e0d8;
+    --person: #2f6fdd; --company: #e07a1f; --product: #1f9d6b; --rm: #8a4fd6; --entity: #2f6fdd14;
+    --transfer: #c2410c;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #12151c; --card: #1b2029; --ink: #e8ebf2; --muted: #9aa3b5; --line: #7b849a; --border: #2b3240;
+      --person: #6b9cf0; --company: #f0a052; --product: #45c48f; --rm: #b38af0; --entity: #6b9cf01a;
+      --transfer: #f08a5d;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #12151c; --card: #1b2029; --ink: #e8ebf2; --muted: #9aa3b5; --line: #7b849a; --border: #2b3240;
+    --person: #6b9cf0; --company: #f0a052; --product: #45c48f; --rm: #b38af0; --entity: #6b9cf01a;
+    --transfer: #f08a5d;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+         font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  main { max-width: 1120px; margin: 0 auto; padding: 28px 16px 48px; }
+  h1 { font-size: 26px; margin: 0 0 4px; }
+  .sub { color: var(--muted); margin: 0 0 20px; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px; }
+  svg { width: 100%; height: auto; display: block; }
+  svg text { fill: var(--ink); font-family: inherit; }
+  .lbl { font-size: 13px; font-weight: 600; }
+  .prop { font-size: 11.5px; fill: var(--muted); }
+  .ntitle { font-size: 17px; font-weight: 700; fill: #fff; }
+  .ncount { font-size: 12px; fill: #ffffffd9; }
+  .edge { fill: none; stroke: var(--line); stroke-width: 2; }
+  .edge.tr { stroke: var(--transfer); stroke-width: 2.6; stroke-dasharray: 7 5; }
+  .pill { fill: var(--card); stroke: var(--border); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; margin-top: 16px; }
+  .grid h3 { margin: 0 0 6px; font-size: 15px; }
+  .grid ul { margin: 0; padding-left: 18px; color: var(--muted); font-size: 14px; }
+  .grid li b { color: var(--ink); }
+  code { font-family: ui-monospace, Consolas, monospace; font-size: 13px; }
+  .note { color: var(--muted); font-size: 13px; margin-top: 14px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Skema Knowledge Graph</h1>
+  <p class="sub">Satu graph Neo4j berisi 4 jenis node dan 7 jenis relasi. Sumber: <code>src/graph/ingest.py</code>. Angka dari data sintetis hasil cleaning.</p>
+
+  <div class="card">
+    <svg viewBox="0 20 1060 590" role="img" aria-label="Diagram node dan relasi knowledge graph">
+      <defs>
+        <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="var(--line)"/>
+        </marker>
+        <marker id="arrT" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="var(--transfer)"/>
+        </marker>
+      </defs>
+
+      <!-- :Entity group -->
+      <rect x="20" y="40" width="640" height="350" rx="22" fill="var(--entity)" stroke="var(--person)" stroke-dasharray="6 6"/>
+      <text x="42" y="68" class="lbl" style="fill:var(--person)">:Entity — pihak yang bisa saling transfer uang</text>
+
+      <!-- TRANSFER edges (antar Person, antar Company, Person <-> Company) -->
+      <path class="edge tr" d="M217,192 C280,150 400,150 461,190" marker-end="url(#arrT)"/>
+      <path class="edge tr" d="M463,288 C400,330 280,330 219,290" marker-end="url(#arrT)"/>
+      <path class="edge tr" d="M90,215 C20,185 20,295 88,266" marker-end="url(#arrT)"/>
+      <path class="edge tr" d="M584,277 C660,310 610,385 547,312" marker-end="url(#arrT)"/>
+      <rect x="258" y="96" width="164" height="44" rx="10" class="pill"/>
+      <text x="340" y="115" text-anchor="middle" class="lbl" style="fill:var(--transfer)">TRANSFER</text>
+      <text x="340" y="131" text-anchor="middle" class="prop">bulan_ke · nominal · n · jenis</text>
+      <text x="340" y="372" text-anchor="middle" class="prop">payroll, supplier, pembeli, distributor, … (≈798 rb edge)</text>
+
+      <!-- Person -> Company role edges -->
+      <path class="edge" d="M234,240 L444,240" marker-end="url(#arr)"/>
+      <rect x="244" y="224" width="192" height="32" rx="8" class="pill"/>
+      <text x="340" y="245" text-anchor="middle" class="lbl" style="font-size:11.5px">WORKS_AT · OWNS · BUYS_FROM</text>
+
+      <!-- Person node -->
+      <circle cx="160" cy="240" r="74" fill="var(--person)"/>
+      <text x="160" y="232" text-anchor="middle" class="ntitle">Person</text>
+      <text x="160" y="252" text-anchor="middle" class="ncount">≈74 rb nasabah &amp;</text>
+      <text x="160" y="267" text-anchor="middle" class="ncount">non-nasabah</text>
+
+      <!-- Company node -->
+      <circle cx="520" cy="240" r="74" fill="var(--company)"/>
+      <text x="520" y="232" text-anchor="middle" class="ntitle">Company</text>
+      <text x="520" y="252" text-anchor="middle" class="ncount">≈20 rb perusahaan</text>
+      <text x="520" y="267" text-anchor="middle" class="ncount">(50 anchor)</text>
+
+      <!-- Product node -->
+      <circle cx="340" cy="525" r="62" fill="var(--product)"/>
+      <text x="340" y="520" text-anchor="middle" class="ntitle">Product</text>
+      <text x="340" y="540" text-anchor="middle" class="ncount">15 ritel · 23 bisnis</text>
+
+      <!-- HOLDS -->
+      <path class="edge" d="M197,304 C210,420 250,480 284,502" marker-end="url(#arr)"/>
+      <rect x="62" y="410" width="124" height="44" rx="10" class="pill"/>
+      <text x="124" y="429" text-anchor="middle" class="lbl">HOLDS</text>
+      <text x="124" y="445" text-anchor="middle" class="prop">mulai · selesai</text>
+
+      <!-- USES -->
+      <path class="edge" d="M483,304 C470,420 430,480 396,502" marker-end="url(#arr)"/>
+      <rect x="494" y="410" width="124" height="44" rx="10" class="pill"/>
+      <text x="556" y="429" text-anchor="middle" class="lbl">USES</text>
+      <text x="556" y="445" text-anchor="middle" class="prop">mulai · selesai</text>
+
+      <!-- RM node -->
+      <circle cx="850" cy="240" r="62" fill="var(--rm)"/>
+      <text x="850" y="236" text-anchor="middle" class="ntitle">RM</text>
+      <text x="850" y="256" text-anchor="middle" class="ncount">23 RM · cabang</text>
+
+      <!-- MANAGED_BY -->
+      <path class="edge" d="M594,240 L786,240" marker-end="url(#arr)"/>
+      <rect x="626" y="196" width="128" height="30" rx="8" class="pill"/>
+      <text x="690" y="216" text-anchor="middle" class="lbl">MANAGED_BY</text>
+      <text x="690" y="262" text-anchor="middle" class="prop">1.233 perusahaan kelolaan</text>
+
+      <!-- GDS output box -->
+      <rect x="690" y="380" width="330" height="170" rx="14" fill="none" stroke="var(--border)" stroke-width="1.5"/>
+      <text x="710" y="408" class="lbl">Hasil algoritma graph (Neo4j GDS)</text>
+      <text x="710" y="432" class="prop">Dihitung per jendela waktu, hanya data</text>
+      <text x="710" y="448" class="prop">sebelum bulan label (tanpa lookahead):</text>
+      <text x="710" y="476" class="lbl" style="font-weight:500">• PageRank → seberapa sentral</text>
+      <text x="710" y="500" class="lbl" style="font-weight:500">• Louvain → komunitas value chain</text>
+      <text x="710" y="524" class="lbl" style="font-weight:500">• FastRP → embedding (emb_*)</text>
+      <text x="710" y="542" class="prop">dipakai sebagai fitur model NBO &amp; akuisisi</text>
+    </svg>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <h3>Node</h3>
+      <ul>
+        <li><b>Person</b> — usia, pekerjaan, provinsi, bank_utama, is_bank</li>
+        <li><b>Company</b> — sektor, segmen, provinsi, is_anchor, is_bank</li>
+        <li><b>Product</b> — segmen: ritel / bisnis</li>
+        <li><b>RM</b> — cabang</li>
+        <li><b>:Entity</b> = label tambahan Person + Company</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Relasi</h3>
+      <ul>
+        <li><b>TRANSFER</b> Entity → Entity, aliran uang bulanan</li>
+        <li><b>HOLDS</b> Person → Product, masa kepemilikan</li>
+        <li><b>USES</b> Company → Product, masa pemakaian</li>
+        <li><b>WORKS_AT / OWNS / BUYS_FROM</b> Person → Company</li>
+        <li><b>MANAGED_BY</b> Company → RM</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Kenapa begini</h3>
+      <ul>
+        <li>Setiap relasi punya <b>bulan</b>, jadi graph bisa dipotong per jendela waktu.</li>
+        <li><b>TRANSFER</b> menghubungkan nasabah Bank ke non-nasabah → sumber lead akuisisi.</li>
+        <li><b>HOLDS/USES</b> → dasar rekomendasi produk berikutnya (NBO).</li>
+      </ul>
+    </div>
+  </div>
+  <p class="note">Angka: persons 74.406 · companies 19.994 · transfers 797.611 baris · employment 30.637 (karyawan 20.000, pembeli 6.478, pemilik 4.159).</p>
+</main>
+</body>
+</html>

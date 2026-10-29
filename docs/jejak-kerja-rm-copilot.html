@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Jejak Kerja RM Copilot</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a commit log played back like a transport bar — day scrubber on top, milestones down a rail, experiments as before/after meters. */
+:root{
+  --bg:#F3F6F6; --surface:#FFFFFF; --ink:#13282B; --muted:#56696C; --line:#D5E0E0;
+  --teal:#006D77; --teal-soft:#D8ECEE; --orange:#D9531A; --orange-soft:#FBE4D8;
+  --ok:#1E7F4F; --bad:#B4372B;
+  --f-display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body:"IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --f-mono:"IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0E1A1C; --surface:#14262A; --ink:#E4EEEE; --muted:#93A7AA; --line:#25403F;
+  --teal:#3FB8C2; --teal-soft:#173A3E; --orange:#F2864F; --orange-soft:#3A2418; --ok:#4CC28A; --bad:#F07A6C; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0E1A1C; --surface:#14262A; --ink:#E4EEEE; --muted:#93A7AA; --line:#25403F;
+  --teal:#3FB8C2; --teal-soft:#173A3E; --orange:#F2864F; --orange-soft:#3A2418; --ok:#4CC28A; --bad:#F07A6C; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 var(--f-body);padding-inline:16px;padding-block:28px 64px}
+.wrap{max-width:1040px;margin:0 auto;display:grid;gap:40px}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.1}
+h1{font-size:clamp(30px,5vw,48px);font-weight:800;letter-spacing:-.02em}
+h2{font-size:24px;font-weight:700}
+h3{font-size:17px;font-weight:700}
+p{margin:0}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.eyebrow{font:500 12px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--teal)}
+.lead{color:var(--muted);max-width:62ch}
+header{display:grid;gap:14px}
+
+.stats{display:flex;flex-wrap:wrap;gap:12px 28px;margin-top:6px}
+.stat b{display:block;font:700 26px var(--f-display);color:var(--ink)}
+.stat span{font-size:13px;color:var(--muted)}
+
+/* transport */
+.transport{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:12px;border-bottom:1px solid var(--line);display:grid;gap:10px}
+.controls{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+button{font:600 14px var(--f-body);border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:8px 14px;cursor:pointer}
+button:hover{border-color:var(--teal)}
+button:focus-visible,.day:focus-visible{outline:2px solid var(--orange);outline-offset:2px}
+button.primary{background:var(--teal);border-color:var(--teal);color:var(--bg)}
+.now{font:500 13px var(--f-mono);color:var(--muted);min-width:0}
+.days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.day{position:relative;border:0;background:var(--surface);border-radius:6px;padding:6px 8px;text-align:left;font:500 12px var(--f-mono);color:var(--muted);overflow:hidden}
+.day b{display:block;font:700 13px var(--f-body);color:var(--ink)}
+.day .fill{position:absolute;left:0;bottom:0;height:3px;width:0;background:var(--teal);transition:width .4s ease}
+.day.done .fill{width:100%}
+.day.on{background:var(--teal-soft)}
+.day.on .fill{background:var(--orange)}
+
+/* rail */
+.rail{position:relative;display:grid;gap:14px;padding-left:28px}
+.rail::before{content:"";position:absolute;left:8px;top:6px;bottom:6px;width:2px;background:var(--line)}
+.rail .prog{position:absolute;left:8px;top:6px;width:2px;height:0;background:var(--teal);transition:height .5s ease}
+.ms{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;display:grid;gap:6px;transition:border-color .3s,box-shadow .3s,transform .3s}
+.ms::before{content:"";position:absolute;left:-25px;top:18px;width:12px;height:12px;border-radius:50%;background:var(--bg);border:2px solid var(--line);transition:all .3s}
+.ms.seen::before{border-color:var(--teal);background:var(--teal)}
+.ms.on{border-color:var(--orange);box-shadow:0 6px 24px -14px var(--orange)}
+.ms.on::before{border-color:var(--orange);background:var(--orange);transform:scale(1.25)}
+.meta{display:flex;flex-wrap:wrap;gap:6px 14px;font:500 12px var(--f-mono);color:var(--muted)}
+.meta .hash{color:var(--teal)}
+.ms ul{margin:2px 0 0;padding-left:18px;color:var(--ink)}
+.ms li{margin:2px 0}
+.tag{display:inline-block;font:600 11px var(--f-mono);letter-spacing:.04em;text-transform:uppercase;padding:1px 7px;border-radius:999px;background:var(--teal-soft);color:var(--teal)}
+.tag.plan{background:var(--orange-soft);color:var(--orange)}
+.ms.future{border-style:dashed}
+
+/* experiments */
+.exps{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+.exp{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;display:grid;gap:8px;align-content:start;min-width:0}
+.exp .kind{font:500 11px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.exp p{font-size:14px;color:var(--muted)}
+.exp p strong{color:var(--ink);font-weight:600}
+.meter{display:grid;gap:4px}
+.row{display:grid;grid-template-columns:92px minmax(0,1fr) 64px;align-items:center;gap:8px;font-size:12.5px}
+.row .lbl{color:var(--muted)}
+.row .val{font:500 12.5px var(--f-mono);text-align:right}
+.bar{height:10px;background:var(--bg);border-radius:3px;overflow:hidden}
+.bar i{display:block;height:100%;width:var(--w);background:var(--muted);border-radius:3px;transition:width 1.1s cubic-bezier(.2,.7,.2,1)}
+.bar i.after{background:var(--teal)}
+.bar i.warn{background:var(--orange)}
+.exps.replay .bar i{width:0;transition:none}
+.verdict{font:600 12.5px var(--f-body);display:flex;gap:6px;align-items:baseline}
+.verdict.ok{color:var(--ok)} .verdict.bad{color:var(--bad)} .verdict.mid{color:var(--orange)}
+.filters{display:flex;flex-wrap:wrap;gap:8px}
+.filters button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+footer{color:var(--muted);font-size:13px;border-top:1px solid var(--line);padding-top:16px}
+
+@media (max-width:640px){.days{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Capstone Data Analytics</div>
+    <h1>Jejak kerja RM Copilot</h1>
+    <p class="lead">Semua yang sudah dikerjakan, diurutkan dari git log, ditambah percobaan yang kami jalankan dan hasilnya. Tekan <b>Putar</b> untuk menelusuri dari awal sampai demo.</p>
+    <div class="stats">
+      <div class="stat"><b class="mono">27</b><span>commit</span></div>
+      <div class="stat"><b class="mono">7</b><span>hari kerja sejak kick-off</span></div>
+      <div class="stat"><b class="mono" id="nexp">16</b><span>percobaan tercatat</span></div>
+      <div class="stat"><b class="mono">2</b><span>hari lagi ke demo</span></div>
+    </div>
+  </header>
+
+  <section class="transport" aria-label="Kontrol putar timeline">
+    <div class="controls">
+      <button class="primary" id="play" type="button">Putar</button>
+      <button id="restart" type="button">Ulang dari awal</button>
+      <span class="now" id="now">Semua tahap ditampilkan</span>
+    </div>
+    <div class="days" id="days"></div>
+  </section>
+
+  <section style="display:grid;gap:16px">
+    <h2>Timeline</h2>
+    <div class="rail" id="rail"><div class="prog" id="prog"></div></div>
+  </section>
+
+  <section style="display:grid;gap:16px">
+    <div style="display:grid;gap:6px">
+      <h2>Percobaan dan hasilnya</h2>
+      <p class="lead">Setiap kartu: apa yang kami coba, angka sebelum dan sesudah, lalu keputusannya. Abu-abu = sebelum, teal = sesudah.</p>
+    </div>
+    <div class="filters" id="filters" role="group" aria-label="Saring percobaan"></div>
+    <div class="exps" id="exps"></div>
+  </section>
+
+  <footer>Sumber: git log repo JaxToon/value-chain-rm-copilot, docs/Hasil_Model.md, docs/Hasil_DeepEval.md, dan catatan sesi kerja. Semua data sintetis; angka adalah hasil simulasi, bukan performa di data Bank.</footer>
+</div>
+
+<script>
+const DAYS = [
+  {id:"agu", label:"19 Agu", sub:"PoC awal"},
+  {id:"o7", label:"7 Okt", sub:"Kick-off"},
+  {id:"o8", label:"8 Okt", sub:"Data sintetis"},
+  {id:"o9", label:"9 Okt", sub:"Bangun sistem"},
+  {id:"o10", label:"10 Okt", sub:"Uji & bukti"},
+  {id:"o12", label:"11–13 Okt", sub:"Per peran & Docker"},
+  {id:"demo", label:"13–15 Okt", sub:"Capstone & demo"}
+];
+const MS = [
+  {day:"agu", time:"19 Agu 08:42–11:25", hash:"e6f21b1 → af52661", title:"PoC NBO graph-ML di data Santander",
+   items:["Neo4j GDS FastRP + LightGBM untuk link prediction","Fitur tenure dan aktivitas, hard-negative sampling, cross-validation","Audit lineage per nasabah"]},
+  {day:"o7", time:"7 Okt 13:23", hash:"ecfb81d", title:"Mulai capstone",
+   items:["Konteks tambahan proyek dan graphify untuk memetakan repo lama"]},
+  {day:"o8", time:"8 Okt 08:33–15:56", hash:"2aaad23 → 08ea353", title:"Pindah ke data sintetis penuh",
+   items:["Santander hanya dipakai sebagai rujukan bentuk perilaku","Generator v1 + config dengan label ASUMSI dan sumber resmi (BPS, OJK, AKKI, LPS)"]},
+  {day:"o9", time:"9 Okt 09:58–10:33", hash:"2f1a0d0 → c8b00c7", title:"PRD, guideline, dan konteks bisnis",
+   items:["Guideline data sintetis dan PRD siap untuk grill me","Hasil interview RM wholesale dan Product Specialist","DeepEval masuk PRD untuk mengevaluasi keluaran LLM"]},
+  {day:"o9", time:"9 Okt 16:16", hash:"645aa04", title:"Grill me selesai (30 pertanyaan)",
+   items:["Fokus segmen Commercial, F12 tetap dikerjakan","Data Corporate ditambah; perorangan diperbanyak pedagang dan pengusaha","Walk-forward 2 jendela label; ambang DeepEval ditetapkan"]},
+  {day:"o9", time:"9 Okt 16:42", hash:"dbdb4eb", title:"Generator selesai, pipeline ML dimulai",
+   items:["52/52 cek validasi generator lulus","Upah per umur (BPS) dan produk per penghasilan (KSEI)","Cleaning: 100% cocok dengan data asli, termasuk entity resolution"]},
+  {day:"o9", time:"9 Okt 17:43", hash:"2fdec31", title:"Neo4j terisi, training berjalan",
+   items:["94.461 node dan 973.369 relasi","FastRP 64 dimensi, PageRank, Louvain per jendela"]},
+  {day:"o9", time:"9 Okt 19:49", hash:"191c52b", title:"Perbaikan data dan model, GenAI, dashboard",
+   items:["Drift embedding dan fitur kumulatif diperbaiki","Champion per tipe prospek, kalibrasi isotonic, SHAP, fairness","RAG katalog 216 produk, agent F17, Tanya AI, guardrail 4 lapis","Dashboard Streamlit 8 halaman"]},
+  {day:"o9", time:"9 Okt 20:37", hash:"4d62479", title:"LLM penjawab pindah ke Gemma 4 E4B lokal",
+   items:["Data tidak keluar dari laptop; OpenAI hanya untuk juri DeepEval","Mode berpikir dimatikan; langkah terakhir agent hanya boleh menyusun draft","Draft terstruktur dengan fallback ke template"]},
+  {day:"o9", time:"9 Okt 22:11–22:24", hash:"94d763b → 461bd1c", title:"DeepEval 3 run, guardrail output baru, README",
+   items:["Lolos 91% → 98% → 97%","Guardrail menghapus janji imbal hasil dari pitch","README cara menjalankan untuk tim"]},
+  {day:"o10", time:"10 Okt 23:19", hash:"2752787", title:"Bukti statistik, red team, siap demo",
+   items:["Bootstrap CI: champion vs baseline dan ablation graph","Class weights vs oversampling, kalibrasi ECE 0,006–0,041","Red team + lapisan semantik Gemma; audit log mencatat versi prompt","Cache demo, uji fallback, diagram arsitektur"]},
+  {day:"o10", time:"10 Okt 23:26", hash:"8a854b4", title:"Visualisasi jejak kerja dan percobaan",
+   items:["Halaman timeline beranimasi ini, berisi semua tahap dan percobaan"]},
+  {day:"o12", time:"11–12 Okt", hash:"e031b4a → 99cee3a", title:"Masukan tim: rekonsiliasi BA, dashboard per peran, Docker",
+   items:["Rekonsiliasi angka business case BA dengan angka terukur sistem","Notebook EDA data sintetis",
+          "Login demo dan beranda khusus RM Retail, RM Wholesale/Corporate, dan Manajemen; Tanya AI jadi halaman sendiri",
+          "Docker compose: app, Ollama (Gemma), dan Neo4j + GDS",
+          "Dokumen implementasi baseline ML, GenAI dan RAG, serta guardrail; PRD diperbarui"]},
+  {day:"o12", time:"12 Okt 21:08–21:20", hash:"d209bb4 → 93a7922", title:"Dokumentasi diperbarui dan panduan demo untuk tim",
+   items:["PRD: dashboard per peran (F23), Docker (F24), hasil uji statistik dan DeepEval","Tabel perubahan setelah grill me; diagram arsitektur dan timeline diperbarui",
+          "Panduan mencoba demo lewat Docker untuk BA, DE, dan DS"]},
+  {day:"o12", time:"13 Okt 08:15", hash:"897f54c", title:"Ringkasan cleaning, generator, dan EDA",
+   items:["Ringkasan proses cleaning data dan notebook cleaning","Ringkasan dataset hasil generator","Interpretasi hasil EDA"]},
+  {day:"demo", time:"13–15 Okt", hash:"rencana", title:"Hari capstone dan demo langsung", future:true,
+   items:["Gladi alur demo dan cek tampilan dashboard","Demo langsung 15 Oktober 2026"]}
+];
+const EXPS = [
+  {k:"Model", t:"Embedding FastRP mentah dipakai langsung",
+   d:"Koordinat embedding tidak sejajar antar jendela waktu, jadi model turun saat diuji di jendela berikutnya.",
+   rows:null, v:["ok","Diganti fitur kemiripan di dalam satu jendela"]},
+  {k:"Model", t:"Fitur kumulatif bergeser antar jendela",
+   d:"Bulan aktif 5 vs 11 membuat skor Logistic Regression karyawan jenuh.",
+   rows:[["AUC sebelum",.5,"0,500"],["AUC sesudah",.722,"0,722",1]], scale:1, v:["ok","Lookback 5 bulan + nilai dipotong ±5"]},
+  {k:"Model", t:"Champion vs baseline (bootstrap 1.000x)",
+   d:"Apakah model benar-benar lebih baik dari cara kerja RM sekarang?",
+   rows:[["Akuisisi",.193,"+0,193",1],["NBO",.136,"+0,136",1],["Cross-sell",.065,"+0,065",1],["Perusahaan",.011,"+0,011","w"]], scale:.25,
+   v:["mid","Signifikan kecuali prospek perusahaan [−0,001; 0,023]"]},
+  {k:"Model", t:"Ablation: apakah graph membantu?",
+   d:"LightGBM + graph dibandingkan LightGBM tanpa graph, dalam selisih ROC-AUC.",
+   rows:[["Karyawan",.201,"+0,201",1],["Pedagang",.196,"+0,196",1],["Akuisisi",.108,"+0,108",1],["Perusahaan",.059,"+0,059",1]], scale:.25,
+   v:["ok","Graph signifikan membantu di 7 dari 9 mesin"]},
+  {k:"Model", t:"Class weights vs oversampling",
+   d:"Keduanya diuji dengan parameter LightGBM yang sama; yang menang di validasi dipakai.",
+   rows:[["Karyawan, valid",.371,"0,371"],["Oversampling",.389,"0,389",1]], scale:.5,
+   v:["mid","Hasil mirip; hanya karyawan pindah ke oversampling"]},
+  {k:"Model", t:"Kalibrasi peluang",
+   d:"Ranking nilai harapan (peluang × nilai − biaya) butuh peluang yang jujur. ECE 0 = sempurna.",
+   rows:[["ECE terbaik",.006,"0,006",1],["ECE terburuk",.041,"0,041","w"]], scale:.1, v:["ok","Cukup terkalibrasi di semua mesin"]},
+  {k:"Bisnis", t:"Baseline NBO menghasilkan Rp0",
+   d:"Ternyata bukan bug: dengan ranking produk terpopuler, kampanye rugi di semua volume kontak.",
+   rows:[["Baseline",0,"Rp0"],["Nilai harapan",118,"Rp118 jt",1]], scale:120, v:["ok","Nilai muncul saat peluang digabung nilai rupiah"]},
+  {k:"Model", t:"Penjelasan nasabah mirip (NBO)",
+   d:"Berapa banyak dari 50 tetangga graph yang memegang produk yang direkomendasikan?",
+   rows:[["Lift rata-rata",.34,"0,34x","w"],["Lift ≥ 1,5x",.087,"8,7%",1]], scale:1,
+   v:["mid","Ditampilkan hanya bila lift ≥ 1,5x; sisanya pakai SHAP"]},
+  {k:"LLM", t:"Gemma 4 E4B: mode berpikir",
+   d:"Panggilan pertama timeout dan jatuh ke template. Jawaban pendek diukur ulang.",
+   rows:[["Berpikir aktif",13.7,"13,7 dtk","w"],["Dimatikan",6.6,"6,6 dtk",1]], scale:15, v:["ok","Sekitar 2x lebih cepat"]},
+  {k:"LLM", t:"Agent berputar tanpa menyusun draft",
+   d:"Gemma memakai 6 langkah untuk mencari data. Langkah terakhir dibatasi ke susun_draft, dan tool menerima daftar produk.",
+   rows:[["Langkah dulu",6,"6 (gagal)","w"],["Langkah kini",5,"5 (selesai)",1]], scale:6, v:["ok","Mode LLM, 15–27 detik per paket"]},
+  {k:"LLM", t:"Juri DeepEval: GPT-4.1 → gpt-4.1-mini",
+   d:"Credit OpenAI hanya $8, jadi juri diganti ke versi mini yang tetap jauh lebih besar dari Gemma.",
+   rows:[["Per 45 kasus",.28,"$0,28",1]], scale:1, v:["ok","Cukup untuk puluhan run"]},
+  {k:"LLM", t:"DeepEval 3 run",
+   d:"Run 1 menemukan sumber katalog salah dan rubrik ambigu; run 2 menemukan janji imbal hasil dan RAG L/C.",
+   rows:[["Run 1",.91,"91%"],["Run 2",.98,"98%",1],["Run 3",.97,"97%",1]], scale:1, v:["ok","Final 97% dari 215 penilaian"]},
+  {k:"LLM", t:"Kepatuhan pitch",
+   d:"Bagian yang paling banyak gagal di run pertama.",
+   rows:[["Run 1",.70,"70%"],["Run 3",.98,"98%",1]], scale:1, v:["ok","Rubrik diperjelas + guardrail janji imbal hasil"]},
+  {k:"Guardrail", t:"Red team: serangan yang dikenal",
+   d:"25 serangan parafrase dan 10 pertanyaan sah ke guardrail input berbasis aturan.",
+   rows:[["Sebelum",22/25,"22/25"],["Sesudah",1,"25/25",1],["Salah blokir",0,"0/10",1]], scale:1, v:["ok","Pola data pihak lain ditambahkan"]},
+  {k:"Guardrail", t:"Red team: serangan yang belum pernah dilihat",
+   d:"Ujian sebenarnya untuk regex. Lapisan semantik Gemma ditambahkan di Tanya AI.",
+   rows:[["Hanya regex",.5,"2/4","w"],["+ Gemma",1,"4/4",1]], scale:1, v:["ok","Dua lapis: aturan + klasifikasi LLM"]},
+  {k:"Aplikasi", t:"Uji browser dashboard per peran",
+   d:"Playwright login sebagai ketiga akun demo dan membuka setiap halaman di menunya.",
+   rows:[["Halaman diuji",1,"15",1],["Error",0,"0",1]], scale:1, v:["ok","Semua halaman terbuka tanpa error"]},
+  {k:"Guardrail", t:"Produk di luar rekomendasi model",
+   d:"Gemma sempat menambahkan produk yang tidak diusulkan model. Kini dicoret otomatis dan dicatat di guardrail.",
+   rows:null, v:["ok","Peluang hanya dari skor_produk"]}
+];
+
+const $ = s => document.querySelector(s);
+const daysEl = $("#days"), rail = $("#rail"), prog = $("#prog"), nowEl = $("#now"), playBtn = $("#play");
+DAYS.forEach((d,i) => {
+  const b = document.createElement("button");
+  b.className = "day done"; b.type = "button"; b.dataset.day = d.id; b.id = "day-" + d.id;
+  b.innerHTML = `<b>${d.label}</b>${d.sub}<span class="fill"></span>`;
+  b.addEventListener("click", () => { stop(); const i = MS.findIndex(m => m.day === d.id); show(i, true); });
+  daysEl.appendChild(b);
+});
+const cards = MS.map((m,i) => {
+  const el = document.createElement("article");
+  el.className = "ms seen" + (m.future ? " future" : ""); el.id = "ms-" + i;
+  const tag = m.future ? '<span class="tag plan">rencana</span>' : `<span class="hash">${m.hash}</span>`;
+  el.innerHTML = `<div class="meta"><span>${m.time}</span>${tag}</div><h3>${m.title}</h3><ul>${m.items.map(x => `<li>${x}</li>`).join("")}</ul>`;
+  rail.appendChild(el); return el;
+});
+prog.style.height = "calc(100% - 12px)";
+
+let idx = -1, timer = null;
+function show(i, scroll){
+  idx = i;
+  const day = MS[i].day, di = DAYS.findIndex(d => d.id === day);
+  cards.forEach((c,j) => { c.classList.toggle("seen", j <= i); c.classList.toggle("on", j === i); });
+  DAYS.forEach((d,j) => { const b = $("#day-" + d.id); b.classList.toggle("done", j < di); b.classList.toggle("on", j === di); });
+  const c = cards[i], r = rail.getBoundingClientRect(), cr = c.getBoundingClientRect();
+  prog.style.height = Math.max(0, cr.top - r.top + 18) + "px";
+  nowEl.textContent = `${i + 1}/${MS.length} · ${MS[i].time} · ${MS[i].title}`;
+  if (scroll && !matchMedia("(prefers-reduced-motion: reduce)").matches) c.scrollIntoView({behavior:"smooth", block:"center"});
+}
+function step(){
+  if (idx >= MS.length - 1){ stop(); replayBars(); return; }
+  show(idx + 1, true);
+}
+function play(){
+  if (idx >= MS.length - 1 || idx < 0) { idx = -1; }
+  playBtn.textContent = "Jeda"; step(); timer = setInterval(step, 2400);
+}
+function stop(){ clearInterval(timer); timer = null; playBtn.textContent = "Putar"; }
+playBtn.addEventListener("click", () => timer ? stop() : play());
+$("#restart").addEventListener("click", () => { stop(); idx = -1; play(); });
+
+/* experiments */
+const kinds = ["Semua", ...new Set(EXPS.map(e => e.k))];
+const exps = $("#exps"), filters = $("#filters");
+kinds.forEach(k => {
+  const b = document.createElement("button"); b.type = "button"; b.textContent = k; b.id = "f-" + k;
+  b.setAttribute("aria-pressed", k === "Semua"); b.addEventListener("click", () => filter(k)); filters.appendChild(b);
+});
+$("#nexp").textContent = EXPS.length;
+EXPS.forEach(e => {
+  const el = document.createElement("article"); el.className = "exp"; el.dataset.k = e.k;
+  const rows = e.rows ? `<div class="meter">${e.rows.map(r => {
+    const w = Math.min(100, Math.max(1.5, r[1] / e.scale * 100));
+    const cls = r[3] === "w" ? "warn" : (r[3] ? "after" : "");
+    return `<div class="row"><span class="lbl">${r[0]}</span><span class="bar"><i class="${cls}" style="--w:${w}%"></i></span><span class="val">${r[2]}</span></div>`;
+  }).join("")}</div>` : "";
+  el.innerHTML = `<span class="kind">${e.k}</span><h3>${e.t}</h3><p>${e.d}</p>${rows}<div class="verdict ${e.v[0]}">${{ok:"✓",mid:"≈",bad:"✗"}[e.v[0]]} ${e.v[1]}</div>`;
+  exps.appendChild(el);
+});
+function filter(k){
+  [...filters.children].forEach(b => b.setAttribute("aria-pressed", b.textContent === k));
+  [...exps.children].forEach(c => c.hidden = !(k === "Semua" || c.dataset.k === k));
+  replayBars();
+}
+function replayBars(){
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  exps.classList.add("replay"); void exps.offsetWidth;
+  requestAnimationFrame(() => exps.classList.remove("replay"));
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,240 @@
+# Konfigurasi generator data sintetis.
+# Setiap angka di sini adalah ASUMSI tim (tidak ada data publiknya) atau pilihan ukuran.
+# Angka yang ada sumbernya TIDAK ditulis di sini: diambil langsung dari folder reference/
+# (lihat reference/SUMBER.md). Ubah asumsi di sini, jangan di kode.
+
+seed: 42
+bulan: 17                      # kalender 2025-01..2026-05, lihat reference/kalender_2025_2026.csv
+
+nasabah:
+  jumlah_awal: 50000           # ukuran: nasabah Bank sintetis di bulan 1
+  sampel_populasi_kali: 4      # populasi dibuat 4x lebih besar, lalu nasabah dipilih darinya
+  # ASUMSI: nasabah baru di bulan berjalan hanya memegang rekening utama (+ mobile banking bila dibuka online)
+  nasabah_baru_mobile_peluang: 0.5
+  # ASUMSI: 75-79 tahun = 50% dari kelompok BPS "75+" (BPS tidak memisahkan 75-79)
+  porsi_75_79_dari_75plus: 0.5
+  # ASUMSI: batas umur status pelajar/mahasiswa dan pensiunan (SNLIK hanya memberi total)
+  umur_maks_pelajar: 30
+  umur_min_pensiunan: 50
+  # Aturan katalog: Tabungan Plus Muda untuk "mahasiswa, first jobber, anak muda 17-35".
+  # ASUMSI: "first jobber" = umur 17-25
+  umur_maks_first_jobber: 25
+  # ASUMSI: channel akuisisi di perdesaan (tidak ada data publik per channel)
+  peluang_agen_perdesaan: 0.5
+
+produk:
+  # ASUMSI: satu orang memegang paling banyak satu kartu kredit (AKKI menghitung keping kartu)
+  kartu_per_pemegang: 1.0
+  # ASUMSI: proporsi pengguna mobile banking = 15,1 juta pengguna (H1 2026) / 62,5 juta nasabah Bank (2021,
+  # titik tengah "62-63 juta"); jumlah nasabah Bank terbaru tidak dipublikasikan
+  nasabah_bank_juta: 62.5
+  peluang_maks: 0.95           # batas atas peluang memegang satu produk
+  # ASUMSI: makin besar penghasilan makin besar peluang memegang produk ini, peluang ~
+  # (penghasilan / median penghasilan nasabah berpenghasilan) ^ beta. Tidak ada data publik
+  # Indonesia kepemilikan per penghasilan untuk produk ini; beta dipilih tim dan bisa diuji.
+  # Reksa Dana dan Bonds tidak di sini: bentuknya dari KSEI (reference/ksei_investor_2025.csv).
+  gradien_pendapatan:
+    Bank Deposito: 0.7
+    Bank Giro: 0.5
+    Prioritas: 1.5
+    Bank Visa Platinum: 0.5
+
+value_chain:
+  jumlah_anchor: 50
+  jumlah_perusahaan: 20000            # ukuran: cukup untuk >= 100 label wholesale per jendela (grill me Q22)
+  # ASUMSI dari guideline: peran perusahaan non-anchor
+  porsi_peran: {SUPPLIER: 0.40, DISTRIBUTOR: 0.30, LAINNYA: 0.30}
+  # ASUMSI: skala anchor (anchor = nasabah korporasi Bank)
+  skala_anchor: {Menengah: 0.3, Besar: 0.7}
+  # ASUMSI: skala mitra B2B. Rujukan nasional (KemenKopUKM 2021) 99,62% mikro tidak cocok
+  # untuk mitra rantai pasok korporasi, jadi porsi ini dipilih tim dan disebut terbuka.
+  skala_mitra: {Mikro: 0.55, Kecil: 0.28, Menengah: 0.13, Besar: 0.04}
+  # Batas omzet per skala mengikuti PP 7/2021 (reference/indikator_publik.csv).
+  # ASUMSI: batas bawah usaha mikro dan batas atas usaha besar (PP tidak memberi batas ini).
+  omzet_min_mikro: 100000000           # Rp100 juta per tahun
+  omzet_maks_besar: 5000000000000      # Rp5 triliun per tahun
+  # Jumlah karyawan per skala mengikuti klasifikasi BPS; ASUMSI ekor usaha besar (Pareto)
+  karyawan_besar_pareto_alpha: 1.5
+  karyawan_besar_maks: 20000
+  sektor_dikecualikan: [O]             # ASUMSI: administrasi pemerintahan bukan perusahaan swasta
+  tahun_berdiri: [1990, 2024]          # ASUMSI: rentang tahun berdiri
+  porsi_relasi_mulai_sebelum_panel: 0.8  # ASUMSI
+  anchor_tambahan_rata2: 0.3           # ASUMSI: mitra bisa terhubung ke >1 anchor (Poisson)
+  porsi_perusahaan_bank: 0.25      # ASUMSI dari guideline
+  peluang_payroll_bank_jika_bank: 0.8  # ASUMSI
+  peluang_mitra_satu_provinsi: 0.7     # ASUMSI: mitra cenderung di provinsi anchor
+  pareto_daya_tarik_anchor: 1.2        # ASUMSI: makin kecil makin timpang (power law degree)
+  sub_supplier_rata2: 1.0              # ASUMSI: rata-rata sub-supplier per supplier (relasi 2 langkah)
+  karyawan_dimaterialisasi_maks: 40    # ukuran: karyawan per perusahaan yang dibuat sebagai Person
+  jumlah_nasabah_terhubung: 8000
+  jumlah_prospek_perorangan: 12000
+  # Pedagang perorangan (grill me Q12, Q19): pengusaha/wiraswasta tanpa badan hukum yang membeli
+  # dari distributor atau anchor nasabah Bank, sehingga pembayarannya terlihat bank. ASUMSI ukuran.
+  jumlah_pedagang: 8000
+  # ASUMSI: pembelian bulanan = penghasilan bersih pedagang x faktor ini (margin dagang 15-50%)
+  pembelian_pedagang_kali_penghasilan: [2, 6]
+  transaksi_pedagang_per_bulan: 4         # ASUMSI rata-rata Poisson
+  porsi_relasi_tidak_diketahui: 0.30   # guideline: sebagian jenis relasi sengaja UNKNOWN
+  laju_putus_relasi_bulanan: 0.02      # ASUMSI
+  transaksi_per_bulan: {SUPPLIER: 4, DISTRIBUTOR: 6, LAINNYA: 1}  # ASUMSI rata-rata Poisson
+  porsi_omzet_ke_mitra: [0.02, 0.15]   # ASUMSI: rentang porsi omzet bulanan pembayar ke satu mitra
+  noise_nominal_sd_log: 0.15           # ASUMSI: variasi bulanan nominal (~±15%)
+  # ASUMSI: kenaikan nominal transfer sektor G dan I pada bulan Idul Fitri
+  efek_lebaran_sektor: {G: 1.15, I: 1.15}
+  # THR: Permenaker 6/2016 (1x upah, dibayar paling lambat 7 hari sebelum hari raya).
+  # ASUMSI: semua karyawan sintetis sudah bekerja >= 12 bulan.
+  thr_kali_upah: 1.0
+
+data_kotor:
+  # ASUMSI: masalah kualitas data yang sengaja ditanam di output/data_bank/ supaya ada
+  # pembersihan nyata untuk rubrik EDA (Hari 2). Porsi dipilih tim, bukan dari sumber.
+  # kunci_evaluasi/ tetap bersih; setiap perubahan dicatat di kunci_evaluasi/catatan_data_kotor.csv.
+  aktif: true
+  nasabah.csv:
+    hilang: {kisaran_pendapatan: 0.05, pekerjaan: 0.03, provinsi: 0.02, channel: 0.01}
+    variasi_teks: {provinsi: 0.03, jenis_kelamin: 0.02, pekerjaan: 0.02}
+    outlier: {usia_bulan1: 0.003}
+    duplikat_baris: 0.01
+  nasabah_bulanan.parquet:
+    hilang: {prod_bank_visa_platinum: 0.002, prod_mobile_banking: 0.002, segmen: 0.005}
+    outlier: {usia: 0.001}
+    duplikat_baris: 0.002
+  transfers_monthly.csv:
+    hilang: {jumlah_transaksi: 0.005}
+    outlier: {total_nominal_rp: 0.001}
+    duplikat_baris: 0.005
+  companies.csv:
+    hilang: {tahun_berdiri: 0.03}
+    variasi_teks: {provinsi: 0.03, sektor: 0.02}
+  persons.csv:
+    variasi_teks: {jenis_kelamin: 0.02, provinsi: 0.02}
+  transaksi_counterparty_bulanan.csv:
+    variasi_teks: {counterparty_nama: 0.15}   # nama di pesan transfer diketik beragam
+    duplikat_baris: 0.002
+  lead_bisdev.csv:
+    variasi_teks: {nama_perusahaan: 0.4, anchor_terkait: 0.2}
+    duplikat_baris: 0.03                      # lead yang sama dikirim dua kali
+  saldo_bulanan.csv:
+    hilang: {saldo_akhir_bulan_rp: 0.01}
+    outlier: {saldo_rata2_rp: 0.001}
+
+akuisisi:
+  # Label dibangkitkan dari rumus yang diketahui (guideline bagian 6). Koefisien ini
+  # disembunyikan dari pembuat model sampai evaluasi.
+  bulan_fitur_terakhir: 11
+  # Walk-forward 2 jendela (grill me Q10, Q16): [bulan fitur terakhir, bulan label terakhir].
+  # Jendela 1 = validasi (fitur 1-5, label 6-11), jendela 2 = test (fitur 1-11, label 12-17).
+  # Base rate berlaku per jendela untuk kandidat yang belum jadi nasabah.
+  jendela_label: [[5, 11], [11, 17]]
+  base_rate_target: 0.04               # guideline: 3-5% non-nasabah dalam 6 bulan
+  koefisien:
+    log_nominal_dengan_bank: 0.35
+    porsi_tetangga_bank: 1.6
+    porsi_bank_dua_langkah: 1.2         # rekan kerja / mitra sesama anchor yang sudah di Bank
+    tetangga_baru_bergabung: 0.9
+    lama_relasi_bulan: 0.04
+    skala: 0.25
+    sektor: 0.3
+  # ASUMSI (interview RM: peluang perusahaan datang dari relasi dengan anchor Bank): untuk
+  # prospek perusahaan, volume dan lama relasi dengan nasabah Bank serta mitra dua langkah lebih
+  # berpengaruh, porsi tetangga Bank (yang di dunia nyata tidak terlihat bank) lebih kecil.
+  # Kunci yang tidak ditulis di sini memakai koefisien umum di atas.
+  koefisien_perusahaan:
+    log_nominal_dengan_bank: 1.0
+    porsi_tetangga_bank: 0.4
+    porsi_bank_dua_langkah: 1.0
+    lama_relasi_bulan: 0.6
+  noise_sd: 0.8
+
+wholesale:
+  # Lapisan data RM wholesale dari interview RM Transactional dan Product Specialist
+  # (Okt 2026). Guideline bagian 14. Angka dari interview ditandai "interview"; sisanya ASUMSI.
+  # Batas segmen dari omzet tahunan. Interview: RCC < Rp10 M, Commercial Rp10-150 M (belum final).
+  # ASUMSI: di bawah Rp2 M = UMKM (bukan wholesale), di atas Rp150 M = Corporate.
+  segmen_batas_omzet: {UMKM: 0, RCC: 2.0e9, Commercial: 1.0e10, Corporate: 1.5e11}
+  segmen_dengan_rm: [Commercial, Corporate]   # interview: RCC tidak punya RM transaksi
+  debitur_per_rm: 40                          # interview (perlu validasi)
+  non_debitur_per_rm: 15                      # interview (perlu validasi)
+  # ASUMSI: peluang nasabah Bank wholesale sudah debitur di bulan 1; Commercial 0,73 = 40/55 (interview)
+  peluang_debitur: {UMKM: 0.2, RCC: 0.4, Commercial: 0.73, Corporate: 0.8}
+  peluang_pic_terdaftar: 0.9                  # ASUMSI: nasabah ber-CIF yang punya PIC terdaftar
+  # Rekening sendiri (kelas "nama sama"). ASUMSI.
+  porsi_punya_rekening_bank_lain: 0.5
+  porsi_punya_beberapa_rekening_bank: 0.3
+  porsi_omzet_ke_rekening_sendiri: [0.02, 0.10]   # per bulan, dari omzet bulanan
+  porsi_omzet_pindah_antar_rekening_bank: [0.05, 0.20]
+  # Channel antarbank. Batas dari Bank Indonesia: BI-FAST <= Rp250 jt, SKN <= Rp1 M,
+  # RTGS > Rp100 jt per transaksi. Pilihan di rentang yang tumpang tindih = ASUMSI.
+  batas_bifast: 250000000
+  batas_skn: 1000000000
+  batas_bawah_rtgs: 100000000
+  peluang_bifast_sampai_100jt: 0.8            # sisanya SKN
+  peluang_rtgs_100jt_sampai_1m: 0.6           # sisanya SKN (BI-FAST hanya bila <= Rp250 jt)
+  porsi_counterparty_pindah_bank: 0.03        # ASUMSI: counterpart non-nasabah berganti bank di tengah panel
+  # Saldo. ASUMSI: saldo rata-rata = omzet bulanan x (hari kas / 30); akhir bulan lebih tinggi
+  # karena RM mengejar target ending balance (interview).
+  hari_kas: [5, 30]
+  faktor_akhir_bulan: [1.0, 1.3]
+  noise_saldo_sd_log: 0.1
+  # Fasilitas. Katalog: KMK dan KI untuk usaha berjalan >= 3 tahun. Plafon = ASUMSI porsi omzet.
+  usaha_min_tahun: 3
+  plafon_kmk_porsi_omzet: [0.10, 0.30]
+  plafon_ki_porsi_omzet: [0.20, 0.50]
+  peluang_ki_jika_debitur: 0.3
+  peluang_scf_jika_mitra_anchor_bank: 0.25
+  # Riwayat produk wholesale: peluang dasar pernah memakai (ASUMSI), dikali pengali bila
+  # pemicunya ada. Nama dan nomor dari katalog Bank; target nasabah di katalog menentukan pemicu.
+  produk_wholesale:
+    - {produk: "Bank Deposito Non Perorangan", no_katalog: 163, jenis: rekening, peluang: 0.15, pemicu: saldo_tinggi, pengali: 2.5}
+    - {produk: "Bank Virtual Account Kredit (e-Collection)", no_katalog: 141, jenis: rekening, peluang: 0.10, pemicu: banyak_pembayar, pengali: 3.0}
+    - {produk: "Bank Virtual Account Debit", no_katalog: 157, jenis: rekening, peluang: 0.08, pemicu: banyak_penerima, pengali: 3.0}
+    - {produk: "CIB Receivables", no_katalog: 169, jenis: rekening, peluang: 0.05, pemicu: banyak_pembayar, pengali: 3.0}
+    - {produk: "Ekspor (L/C, negosiasi, pembiayaan)", no_katalog: 121, jenis: transaksi, peluang: 0.03, pemicu: sektor_ekspor, pengali: 4.0}
+    - {produk: "Impor (L/C, pembiayaan)", no_katalog: 122, jenis: transaksi, peluang: 0.04, pemicu: sektor_impor, pengali: 4.0}
+    - {produk: "SKBDN", no_katalog: 123, jenis: transaksi, peluang: 0.05, pemicu: sektor_dagang, pengali: 3.0}
+    - {produk: "SBLC", no_katalog: 124, jenis: transaksi, peluang: 0.02, pemicu: segmen_besar, pengali: 4.0}
+    - {produk: "Garansi Bank", no_katalog: 160, jenis: transaksi, peluang: 0.08, pemicu: kontraktor, pengali: 5.0}
+    - {produk: "Bank Account Sweep (Online/Push/Pull/Push-Pull/Loan-Dep)", no_katalog: 150, jenis: rekening, peluang: 0.02, pemicu: banyak_rekening_bank, pengali: 6.0}
+    - {produk: "Cash Pooling", no_katalog: 151, jenis: rekening, peluang: 0.01, pemicu: segmen_besar, pengali: 8.0}
+  # ASUMSI: sektor KBLI per pemicu
+  sektor_ekspor: [A, B, C]
+  sektor_impor: [C, G]
+  sektor_dagang: [C, G]
+  sektor_kontraktor: [F]
+  durasi_produk_transaksi_bulan: [3, 24]      # ASUMSI: L/C, SKBDN, SBLC, Garansi Bank per proyek
+  peluang_tutup_produk_rekening: 0.1          # ASUMSI
+  tahun_riwayat_mulai: 2018                   # ASUMSI: riwayat produk tercatat sejak tahun ini
+  nilai_proyek_porsi_omzet: [0.05, 0.30]      # ASUMSI: nilai proyek Garansi Bank/SBLC/L/C
+  # File lead Bisdev: sering hanya nama (interview). Porsi kosong = ASUMSI.
+  lead_bisdev_jumlah: 1500
+  lead_bisdev_kosong: {anchor_terkait: 0.3, sektor: 0.7, provinsi: 0.7}
+  lead_bisdev_hari_update: [3, 5]
+  # Label di jendela label (bulan > akuisisi.bulan_fitur_terakhir). Base rate = ASUMSI.
+  # Label per jendela 6 bulan (grill me Q17, Q22). Proksi publik di reference/SUMBER.md.
+  label:
+    # Proksi: kredit investasi nasional +17,98% YoY dan kredit korporasi Bank +10,4% YoY -> sekitar
+    # 5-9% per 6 bulan; dipakai 8% termasuk UMKM yang mengambil KUR (KUR Bank ke ~46 ribu UMKM s.d. Okt 2025)
+    non_debitur_ke_debitur: 0.08
+    # Proksi: pengguna CIB cash +24,8% per tahun -> sekitar 11% per 6 bulan
+    cross_sell_wholesale: 0.11
+    reaktivasi: 0.15        # ASUMSI: dari produk transaksi yang sudah tidak aktif
+    leakage: 0.05           # ASUMSI
+    noise_sd: 0.8
+  label_min_per_jendela: 100     # cek validasi: cukup untuk train dan evaluasi
+  porsi_ki_debitur_baru: 0.5     # ASUMSI: debitur baru non-UMKM mengambil KI vs KMK
+  # KUR untuk UMKM (katalog no. 108 KUR Mikro, 109 KUR Kecil: kebutuhan di atas Rp500 juta diarahkan
+  # ke produk lain). ASUMSI: batas KUR Mikro Rp100 juta; plafon = porsi omzet tahunan.
+  batas_kur_mikro: 100000000
+  batas_kur_kecil: 500000000
+  plafon_kur_porsi_omzet: [0.05, 0.25]
+  tenor_kur_tahun: [1, 3]
+  usaha_min_tahun_kur: 1         # katalog KUR Mikro: usaha berjalan >= 6 bulan (data hanya tahun berdiri)
+  # Produk UMKM untuk nasabah segmen UMKM (grill me Q19, Q26). Proksi QRIS: 39,3 juta merchant
+  # QRIS per semester I 2025 (BI). Peluang = ASUMSI.
+  produk_umkm:
+    - {produk: "QRIS Bank", no_katalog: 207, jenis: rekening, peluang: 0.30, pemicu: sektor_ritel, pengali: 2.0}
+    - {produk: "EDC Bank", no_katalog: 199, jenis: rekening, peluang: 0.05, pemicu: sektor_ritel, pengali: 2.0}
+  sektor_ritel: [G, I]           # ASUMSI: perdagangan dan makan-minum paling butuh QRIS/EDC
+  # Leakage: setelah kejadian, porsi dana ke rekening sendiri di bank lain naik dan saldo turun.
+  leakage_pengali_dana_keluar: 3.0
+  leakage_pengali_saldo: 0.7

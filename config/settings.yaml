@@ -1,0 +1,55 @@
+# Pengaturan pipeline offline. Angka asumsi bisnis ada di docs/asumsi_f12.csv;
+# asumsi data sintetis ada di synthetic_generator/config.yaml.
+paths:
+  raw: synthetic_generator/output/data_bank        # hanya data yang realistis dilihat bank
+  truth: synthetic_generator/output/kunci_evaluasi # hanya untuk evaluasi, jangan jadi fitur
+  catalog: synthetic_generator/reference/produk_bank_knowledge.csv
+  processed: data/processed
+  outputs: outputs
+
+bulan: 17
+seed: 42
+
+# Walk-forward (grill me Q10): [bulan fitur terakhir, bulan label terakhir]
+windows:
+  akuisisi: [[5, 11], [11, 17]]      # jendela 1 = validasi, jendela 2 = test
+  wholesale: [[5, 11], [11, 17]]
+  nbo_label_bulan: [14, 15, 16, 17]  # 4 jendela bulanan; bulan 17 = test
+  nbo_tanpa_produk_bulan: 3          # pembelian baru = tidak dimiliki 3 bulan sebelumnya (Q9)
+  # Fitur aktivitas dihitung dari N bulan terakhir yang sama panjang di setiap jendela,
+  # supaya distribusinya tidak bergeser antar jendela (bukan kumulatif sejak bulan 1).
+  lookback_bulan: 5
+
+neo4j:
+  database: neo4j
+  batch: 20000
+
+graph:
+  fastrp_dim: 64
+  fastrp_iterations: [0.0, 1.0, 1.0, 0.8]
+  random_seed: 42
+
+cleaning:
+  usia_min: 15
+  usia_max: 100
+  outlier_kali_median: 100   # nominal > 100x median pasangan dianggap salah ketik x1000
+
+llm:
+  # Generator: Gemma 4 E4B lokal lewat Ollama (API kompatibel OpenAI), tanpa biaya dan tanpa internet.
+  # Ganti provider ke "openai" dan model_generator ke gpt-4.1-mini untuk memakai OpenAI.
+  provider: ollama
+  base_url_ollama: http://localhost:11434/v1
+  model_generator: gemma4:e4b
+  # Juri DeepEval tetap OpenAI (OPENAI_API_KEY di .env hanya untuk evaluasi), lebih besar dari generator.
+  model_juri: gpt-4.1-mini        # kredit eval terbatas ($8): mini ~5x lebih murah, tetap jauh lebih besar dari Gemma E4B
+  timeout_detik: 60              # model lokal di GPU laptop lebih lambat dari API
+  maks_langkah_agent: 6
+  temperature: 0.2
+
+# Akun demo dashboard (login sederhana per role, bukan sistem login produksi).
+# Password semua akun: demo123 (disimpan sebagai SHA-256). rm_id "auto" = RM dengan mitra
+# anchor showcase terbanyak, sama dengan default halaman Peluang RM.
+akun_demo:
+  - {username: rm.retail, nama: "Sari Wulandari", role: rm_retail, password_sha256: d3ad9315b7be5dd53b31a273b3b3aba5defe700808305aa16a3062b76658a791}
+  - {username: rm.wholesale, nama: "Budi Santoso", role: rm_wholesale, rm_id: auto, password_sha256: d3ad9315b7be5dd53b31a273b3b3aba5defe700808305aa16a3062b76658a791}
+  - {username: manajemen, nama: "Pimpinan Wilayah", role: manajemen, password_sha256: d3ad9315b7be5dd53b31a273b3b3aba5defe700808305aa16a3062b76658a791}
